@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
-
-
-
-
+ 
 List<GameDto> games = [
     new GameDto(
         Id: 1,
@@ -30,20 +27,21 @@ List<GameDto> games = [
         ReleaseDate: new DateOnly(2022, 2, 25)
     ),
  ];
-
-
-
+ 
 const string GetGameEndpointName = "GetGame";
-
-
-
+ 
 app.MapGet("/", () => "Hello World!");
 
 // Get all Games => /games
 app.MapGet("games", () => games);
 
 // Get  Game by ID => /games/{ID}
-app.MapGet("games/{id}", (int id) => games.Find(game => game.Id == id)).WithName(GetGameEndpointName);
+app.MapGet("games/{id}", (int id) =>
+  {
+      GameDto? game = games.Find(game => game.Id == id);
+      return game is null ? Results.NotFound() : Results.Ok(game);
+  } 
+ ).WithName(GetGameEndpointName);
 
 // Create a new Game => /games
 app.MapPost("games", (CreateGameDto newGame) =>
@@ -67,6 +65,12 @@ app.MapPost("games", (CreateGameDto newGame) =>
 app.MapPut("games/{id}", (int id, UpdateGameDto updatedGame) =>
 {
     int index = games.FindIndex(game => game.Id == id);
+
+    if (index == -1)
+    { 
+    return Results.NotFound();  
+}
+    
     games[index] = new(
     id,
     updatedGame.Name,
@@ -78,19 +82,17 @@ app.MapPut("games/{id}", (int id, UpdateGameDto updatedGame) =>
 }
 );
 
-
-
+// delete a Game => /games/{ID}
 app.MapDelete("games/{id}", (int id) =>
 {
  
 int index = games.FindIndex(game => game.Id == id);
 
-
     games.RemoveAt(index);
 
 return Results.NoContent();
     
-}          ); 
+} ); 
 
 
 app.Run();

@@ -10,6 +10,7 @@ GET http://localhost:5198/games/1
 ###
 POST http://localhost:5198/games
 Content-Type: application/json
+
 {
     "name": "Cyberpunk 2077",
     "genre": "Action RPG",
@@ -20,8 +21,9 @@ Content-Type: application/json
 
 
 ###
-PUT http://localhost:5198/games/1
+PUT http://localhost:5198/games/20
 Content-Type: application/json
+
 {
     "name": "The Legend of Zelda: Breath of the Wild",
     "genre": "Action-adventure",
