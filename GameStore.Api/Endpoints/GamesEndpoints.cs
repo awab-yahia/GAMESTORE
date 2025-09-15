@@ -37,17 +37,17 @@ public static class GamesEndpoints
 
 
 
-     public static   WebApplication MapGamesEndpoints(this WebApplication app)
+     public static   RouteGroupBuilder MapGamesEndpoints(this WebApplication app)
     {
-    
 
 
+        var group = app.MapGroup("games"); 
     
 // Get all Games => /games
-app.MapGet("games", () => games);
+        group.MapGet("/", () => games);
 
 // Get  Game by ID => /games/{ID}
-app.MapGet("games/{id}", (int id) =>
+group.MapGet("/{id}", (int id) =>
   {
       GameDto? game = games.Find(game => game.Id == id);
       return game is null ? Results.NotFound() : Results.Ok(game);
@@ -55,7 +55,7 @@ app.MapGet("games/{id}", (int id) =>
  ).WithName(GetGameEndpointName);
 
 // Create a new Game => /games
-app.MapPost("games", (CreateGameDto newGame) =>
+group.MapPost("/", (CreateGameDto newGame) =>
 {
     GameDto game = new(
          games.Count + 1,
@@ -73,7 +73,7 @@ app.MapPost("games", (CreateGameDto newGame) =>
 
 // update a Game => /games/{ID}
 
-app.MapPut("games/{id}", (int id, UpdateGameDto updatedGame) =>
+group.MapPut("/{id}", (int id, UpdateGameDto updatedGame) =>
 {
     int index = games.FindIndex(game => game.Id == id);
 
@@ -94,18 +94,22 @@ app.MapPut("games/{id}", (int id, UpdateGameDto updatedGame) =>
 );
 
 // delete a Game => /games/{ID}
-app.MapDelete("games/{id}", (int id) =>
+group.MapDelete("/{id}", (int id) =>
 {
  
 int index = games.FindIndex(game => game.Id == id);
 
+    if (index == -1)
+    {
+        return Results.NotFound();
+    }
     games.RemoveAt(index);
 
 return Results.NoContent();
     
 } );
 
-        return app; 
+        return group; 
 
 
 }
