@@ -5,9 +5,6 @@ namespace GameStore.Api.Endpoints;
 
 public static class GamesEndpoints
 {
-
-
-
     const string GetGameEndpointName = "GetGame";
 
     private static readonly List<GameDto> games = [
@@ -41,7 +38,7 @@ public static class GamesEndpoints
     {
 
 
-        var group = app.MapGroup("games"); 
+        var group = app.MapGroup("games") .WithParameterValidation(); 
     
 // Get all Games => /games
         group.MapGet("/", () => games);
@@ -54,21 +51,21 @@ group.MapGet("/{id}", (int id) =>
   } 
  ).WithName(GetGameEndpointName);
 
-// Create a new Game => /games
-group.MapPost("/", (CreateGameDto newGame) =>
-{
-    GameDto game = new(
-         games.Count + 1,
-        newGame.Name,
-          newGame.Genre,
-         newGame.Price,
-         newGame.ReleaseDate
-    );
+        // Create a new Game => /games
+        group.MapPost("/", (CreateGameDto newGame) =>
+        {
 
-    games.Add(game);
-    return Results.CreatedAtRoute(GetGameEndpointName, new { id = game.Id }, game);
+            GameDto game = new(
+                 games.Count + 1,
+                newGame.Name,
+                  newGame.Genre,
+                 newGame.Price,
+                 newGame.ReleaseDate
+            );
 
-});
+            games.Add(game);
+            return Results.CreatedAtRoute(GetGameEndpointName, new { id = game.Id }, game);
+        });
 
 
 // update a Game => /games/{ID}
